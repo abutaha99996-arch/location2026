@@ -2,15 +2,14 @@
   "name": "location-tracker",
   "version": "1.0.0",
   "description": "موقع تتبع المواقع الجغرافية",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2"
   },
   "engines": {
-    "node": ">=18.0.0"
-  },
-  "license": "MIT"
+    "node": "18.x"
+  }
 }
