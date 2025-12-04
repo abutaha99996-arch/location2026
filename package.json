@@ -1,15 +1,19 @@
 {
-  "name": "location-tracker",
-  "version": "1.0.0",
-  "description": "موقع تتبع المواقع الجغرافية",
+  "name": "advanced-location-tracker",
+  "version": "2.0.0",
+  "description": "نظام تتبع متقدم مع تلجرام وباركود وتتبع ذكي",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "node-telegram-bot-api": "^0.61.0",
+    "qrcode": "^1.5.3"
   },
   "engines": {
     "node": "18.x"
-  }
+  },
+  "license": "MIT"
 }
