@@ -35,7 +35,7 @@ app.post('/api/save-location', (req, res) => {
     
     console.log('📍 تم تسجيل موقع جديد:');
     console.log('- ID:', data.id);
-    console.log-(' الموقع:', data.latitude, data.longitude);
+    console.log('- الموقع:', data.latitude, data.longitude);
     console.log('- العنوان:', data.address);
     console.log('- الوقت:', data.timestamp);
     console.log('- IP:', data.ip);
