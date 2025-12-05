@@ -1,7 +1,7 @@
 {
   "name": "location-tracker",
   "version": "1.0.0",
-  "description": "نظام تتبع المواقع مع باركود",
+  "description": "موقع تتبع مع باركود",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
