@@ -1,7 +1,7 @@
 {
-  "name": "location-tracker-pro",
-  "version": "3.0.0",
-  "description": "نظام تتبع متقدم مع تلجرام وباركود",
+  "name": "location-tracker",
+  "version": "1.0.0",
+  "description": "موقع تتبع المواقع",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,6 +12,5 @@
   },
   "engines": {
     "node": "18.x"
-  },
-  "license": "MIT"
+  }
 }
